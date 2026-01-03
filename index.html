@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VATRA | Receipt Intelligence Platform</title>
+  <style>
+    :root {
+      --ink: #0b1b1f;
+      --paper: #f6f3ee;
+      --accent: #ff7a3c;
+      --accent-2: #18a0a6;
+      --night: #0c2a2e;
+      --mist: #e9e4da;
+      --shadow: rgba(12, 42, 46, 0.12);
+      --glass: rgba(255, 255, 255, 0.65);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: radial-gradient(1200px 700px at 20% -20%, #ffe6d6 0%, transparent 60%),
+        radial-gradient(900px 700px at 120% 10%, #d4f3f1 0%, transparent 55%),
+        linear-gradient(180deg, #f8f3eb 0%, #f2efe7 100%);
+      font-family: "Georgia", "Times New Roman", serif;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(120deg, rgba(12, 42, 46, 0.05) 0%, rgba(12, 42, 46, 0) 35%),
+        linear-gradient(0deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 32px 24px 96px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0 40px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px 4px;
+      background: linear-gradient(135deg, var(--accent) 0%, #ffbb7a 100%);
+      box-shadow: 0 12px 24px var(--shadow);
+    }
+
+    nav {
+      display: flex;
+      gap: 24px;
+      font-size: 0.95rem;
+    }
+
+    nav a {
+      opacity: 0.7;
+    }
+
+    nav a:hover {
+      opacity: 1;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 32px;
+      align-items: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 4vw, 4.5rem);
+      margin: 0 0 16px;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin: 0 0 24px;
+      color: #2c3c3f;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 26px;
+      border-radius: 999px;
+      background: var(--night);
+      color: #fff;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      box-shadow: 0 18px 35px rgba(12, 42, 46, 0.2);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 40px rgba(12, 42, 46, 0.28);
+    }
+
+    .cta.secondary {
+      background: transparent;
+      color: var(--night);
+      border: 1px solid rgba(12, 42, 46, 0.2);
+      box-shadow: none;
+    }
+
+    .hero-card {
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 28px;
+      border: 1px solid rgba(12, 42, 46, 0.08);
+      box-shadow: 0 25px 45px var(--shadow);
+    }
+
+    .hero-card h3 {
+      margin-top: 0;
+      font-size: 1.2rem;
+    }
+
+    .status-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px rgba(12, 42, 46, 0.06);
+      font-size: 0.9rem;
+    }
+
+    .pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .pill.pending {
+      background: rgba(255, 189, 92, 0.25);
+      color: #835211;
+    }
+
+    .pill.completed {
+      background: rgba(29, 164, 135, 0.2);
+      color: #0f5a4f;
+    }
+
+    section {
+      margin-top: 80px;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      margin: 0 0 16px;
+    }
+
+    .section-subtitle {
+      max-width: 640px;
+      font-size: 1rem;
+      color: #2f3f41;
+      line-height: 1.6;
+    }
+
+    .features {
+      margin-top: 32px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .feature-card {
+      padding: 20px;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 18px 30px rgba(12, 42, 46, 0.08);
+      border: 1px solid rgba(12, 42, 46, 0.06);
+    }
+
+    .feature-card h4 {
+      margin: 14px 0 8px;
+      font-size: 1.1rem;
+    }
+
+    .feature-card p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #3b4a4c;
+      line-height: 1.5;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .flow-step {
+      padding: 22px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, #ffffff 0%, #f9f5ee 100%);
+      border: 1px solid rgba(12, 42, 46, 0.05);
+      box-shadow: 0 14px 24px rgba(12, 42, 46, 0.08);
+    }
+
+    .flow-step span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .grid-split {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 32px;
+      align-items: center;
+    }
+
+    .receipt-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .receipt-table th,
+    .receipt-table td {
+      text-align: left;
+      padding: 10px 12px;
+    }
+
+    .receipt-table tr {
+      border-bottom: 1px solid rgba(12, 42, 46, 0.08);
+    }
+
+    .receipt-shell {
+      background: #fff;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 18px 34px rgba(12, 42, 46, 0.12);
+    }
+
+    .footer {
+      margin-top: 80px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(12, 42, 46, 0.1);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 0.9rem;
+      color: #3f4d4f;
+    }
+
+    .cta-banner {
+      background: linear-gradient(135deg, #0c2a2e 0%, #1d5c63 100%);
+      color: #fff;
+      border-radius: 28px;
+      padding: 28px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      align-items: center;
+    }
+
+    .cta-banner p {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .cta-banner .cta {
+      background: #fff;
+      color: #0c2a2e;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(14px);
+      animation: rise 0.8s ease forwards;
+      animation-delay: var(--d, 0s);
+    }
+
+    @keyframes rise {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 720px) {
+      header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+      }
+
+      nav {
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+
+      .cta-row {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="reveal" style="--d: 0.1s">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        VATRA
+      </div>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#data">Receipt View</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div>
+        <h1 class="reveal" style="--d: 0.2s">One place to import, verify, and share every receipt.</h1>
+        <p class="reveal" style="--d: 0.3s">
+          VATRA is built for teams managing TRA receipts at scale. Import from URLs, track
+          processing status, explore full invoice detail, and share secure verification links or
+          PDFs in seconds.
+        </p>
+        <div class="cta-row reveal" style="--d: 0.4s">
+          <a class="cta" href="https://app.vatra.tz">Open VATRA App</a>
+          <a class="cta secondary" href="#features">See what it does</a>
+        </div>
+      </div>
+      <div class="hero-card reveal" style="--d: 0.35s">
+        <h3>Live import status</h3>
+        <p>Monitor recent entries, sort by status, and keep teams aligned.</p>
+        <div class="status-list">
+          <div class="status-item">
+            <span>TRA-8201-AX</span>
+            <span class="pill pending">pending</span>
+          </div>
+          <div class="status-item">
+            <span>TRA-8202-BR</span>
+            <span class="pill completed">completed</span>
+          </div>
+          <div class="status-item">
+            <span>TRA-8203-QK</span>
+            <span class="pill completed">completed</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <h2 class="section-title reveal" style="--d: 0.2s">Purpose-built for receipt operations</h2>
+      <p class="section-subtitle reveal" style="--d: 0.3s">
+        VATRA centralizes receipt ingestion, verification, and sharing so finance and ops teams
+        can move faster without losing audit-grade detail.
+      </p>
+      <div class="features">
+        <div class="feature-card reveal" style="--d: 0.1s">
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+            <rect x="4" y="5" width="22" height="20" rx="5" stroke="#0c2a2e" stroke-width="2"/>
+            <path d="M9 12h12M9 17h8" stroke="#ff7a3c" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <h4>URL receipt import</h4>
+          <p>Submit multiple verification URLs at once and auto-normalize links.</p>
+        </div>
+        <div class="feature-card reveal" style="--d: 0.2s">
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+            <circle cx="15" cy="15" r="12" stroke="#0c2a2e" stroke-width="2"/>
+            <path d="M15 8v7l5 3" stroke="#18a0a6" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <h4>Realtime status tracking</h4>
+          <p>See pending, failed, and completed imports with live progress.</p>
+        </div>
+        <div class="feature-card reveal" style="--d: 0.3s">
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+            <path d="M7 7h16v16H7z" stroke="#0c2a2e" stroke-width="2"/>
+            <path d="M7 12h16" stroke="#ff7a3c" stroke-width="2"/>
+            <path d="M11 16h8" stroke="#18a0a6" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <h4>Full receipt detail</h4>
+          <p>Expand line items, search across fields, and save preferred columns.</p>
+        </div>
+        <div class="feature-card reveal" style="--d: 0.4s">
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+            <path d="M6 10h18v14H6z" stroke="#0c2a2e" stroke-width="2"/>
+            <path d="M10 6h10" stroke="#18a0a6" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <h4>PDF and JSON sharing</h4>
+          <p>Copy JSON payloads, download TRA PDFs, or send verification links.</p>
+        </div>
+        <div class="feature-card reveal" style="--d: 0.5s">
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+            <path d="M8 8h14v14H8z" stroke="#0c2a2e" stroke-width="2"/>
+            <path d="M12 14h6" stroke="#ff7a3c" stroke-width="2" stroke-linecap="round"/>
+            <path d="M15 11v6" stroke="#18a0a6" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <h4>Templates for issuing</h4>
+          <p>Upload custom receipt templates and preview before issuing.</p>
+        </div>
+        <div class="feature-card reveal" style="--d: 0.6s">
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+            <path d="M7 22l5-5 4 4 7-8" stroke="#0c2a2e" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="22" cy="9" r="3" stroke="#18a0a6" stroke-width="2"/>
+          </svg>
+          <h4>Reliable audit trail</h4>
+          <p>Keep verification codes, timestamps, and starred receipts aligned.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="workflow">
+      <h2 class="section-title reveal" style="--d: 0.2s">Workflow that matches how teams work</h2>
+      <p class="section-subtitle reveal" style="--d: 0.3s">
+        From import to sharing, VATRA keeps every step connected and traceable.
+      </p>
+      <div class="flow">
+        <div class="flow-step reveal" style="--d: 0.1s">
+          <span>1</span>
+          <h4>Import receipts</h4>
+          <p>Drop verification URLs and VATRA fetches structured data instantly.</p>
+        </div>
+        <div class="flow-step reveal" style="--d: 0.2s">
+          <span>2</span>
+          <h4>Review & organize</h4>
+          <p>Search, filter, and expand items. Star what matters most.</p>
+        </div>
+        <div class="flow-step reveal" style="--d: 0.3s">
+          <span>3</span>
+          <h4>Share with confidence</h4>
+          <p>Export PDFs, share URLs, or send JSON for systems integration.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="data" class="grid-split">
+      <div>
+        <h2 class="section-title reveal" style="--d: 0.2s">See every line item without losing context</h2>
+        <p class="section-subtitle reveal" style="--d: 0.3s">
+          Expand receipts to drill into VAT, totals, and invoice items. VATRA keeps
+          verification metadata together with the details your team needs.
+        </p>
+        <div class="cta-row reveal" style="--d: 0.4s">
+          <a class="cta" href="https://app.vatra.tz">Go to VATRA</a>
+        </div>
+      </div>
+      <div class="receipt-shell reveal" style="--d: 0.25s">
+        <table class="receipt-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Verification</th>
+              <th>Store</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>08 Aug 2024</td>
+              <td>TRA-8202-BR</td>
+              <td>Dar Market</td>
+              <td>TZS 215,000</td>
+            </tr>
+            <tr>
+              <td>08 Aug 2024</td>
+              <td>TRA-8203-QK</td>
+              <td>City Tech</td>
+              <td>TZS 89,500</td>
+            </tr>
+            <tr>
+              <td>08 Aug 2024</td>
+              <td>TRA-8204-ZP</td>
+              <td>Kariakoo</td>
+              <td>TZS 142,300</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="cta-banner reveal" style="--d: 0.2s">
+      <div>
+        <h2>Ready to streamline receipt management?</h2>
+        <p>Jump into the VATRA app and start importing receipts in minutes.</p>
+      </div>
+      <div class="cta-row">
+        <a class="cta" href="https://app.vatra.tz">Launch VATRA</a>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>VATRA. Receipt intelligence for Tanzanian operations.</div>
+      <div>Built for import, verification, and clean sharing.</div>
+    </footer>
+  </div>
+</body>
+</html>
